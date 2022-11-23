@@ -43,7 +43,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          
+      - name: Declare variables
+        id: vars
+        shell: bash
+        run: |
+          echo "::set-output name=branch::$(echo ${GITHUB_REF#refs/heads/})"
+          echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
       # Build a Docker image based on provided Dockerfile
       - name: Build and push
         id: docker_build
@@ -51,4 +56,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: adato/app:latest
+          tags: adato/app:${{ steps.vars.outputs.sha_short }}
